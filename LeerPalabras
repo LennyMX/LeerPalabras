@@ -1,0 +1,59 @@
+import java.io.*;
+import java.util.*;
+public class LeerPalabras {
+//se iniicialisa el main para que reciba el archivo a leer y donde guardara los resultados
+    public static void main(String[] args) {
+        LeerPalabras.leer("ArchivoLeer.csv", "frecuencia_palabras.csv");
+    }
+//Metodo para leer el archio utilizando el Map para guardar las palabras y cuanto se repiten
+    public static void leer(String rutaEntrada, String rutaSalida) {
+        Map<String, Integer> conteoPalabras = new HashMap<>();
+//se abre el el archivo y lo lee utilizando el bufferredreader por cada iteracion
+        try {
+            int c = 0;
+            String linea;
+            BufferedReader leer = new BufferedReader(new FileReader(rutaEntrada));
+
+            // Leer cada línea y contar palabras
+            while ((linea = leer.readLine()) != null && c < 2095) {
+                // transformamos todo a minisculas y elimiamos otros caracteres
+                String[] palabras = linea.toLowerCase().split("[^a-zA-Z]+");
+
+
+
+//ciclo para contar cuantas veces se repite cada palabra
+
+                for (String palabra : palabras) {
+                    if (!palabra.isEmpty()) {
+                        conteoPalabras.put(palabra, conteoPalabras.getOrDefault(palabra, 0) + 1);
+                    }
+                }
+                c++;
+            }
+            leer.close();
+
+            // Mostrarmos el conteo de cada palabra
+            conteoPalabras.forEach((palabra, frecuencia) ->
+                    System.out.println("Palabra: " + palabra + ", Frecuencia: " + frecuencia)
+            );
+
+            // guardamos los resultados en el archivo o en caso contratio mostramos mensajes de error
+            guardarFrecuenciaEnCSV(conteoPalabras, rutaSalida);
+            System.out.println("El conteo de palabras se ha guardado en '" + rutaSalida + "'.");
+
+        } catch (FileNotFoundException ex) {
+            System.err.println("No se encontró el archivo '" + rutaEntrada + "'");
+        } catch (IOException ex) {
+            System.err.println("No se puede leer el archivo.");
+        }
+    }
+//metodo para para guardar la palabra con su frecuencia recorriendo todo el Map
+    public static void guardarFrecuenciaEnCSV(Map<String, Integer> conteoPalabras, String rutaSalida) throws IOException {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(rutaSalida))) {
+            writer.println("palabra,frecuencia");
+            for (Map.Entry<String, Integer> entrada : conteoPalabras.entrySet()) {
+                writer.println(entrada.getKey() + "," + entrada.getValue());
+            }
+        }
+    }
+}
